@@ -52,14 +52,16 @@ function refreshMeetingData(meetingData, totalAvailability) {
 }
 
 window.onload = function() {
+    /*
     const button = document.querySelector( '#createPet' )
     button.onclick = submit
     submitNoFields()
+    */
     requestMeetingData('77429c8c-e46d-4886-9fc1-ff69e0880645')
 }
 
 window.onpageshow = function () {
-    submitNoFields()
+    //submitNoFields()
     requestMeetingData('77429c8c-e46d-4886-9fc1-ff69e0880645')
 }
 
@@ -68,7 +70,8 @@ window.onpageshow = function () {
 
 
 
- */
+
+
 const submit = function( e ) {
     // prevent default form action from being carried out
     e.preventDefault()
@@ -133,3 +136,5 @@ const deleteEntry = function (clickedId) {
             refreshGalleryContents(json)
         })
 }
+
+ */

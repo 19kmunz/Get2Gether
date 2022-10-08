@@ -1,3 +1,6 @@
+const express = require("express");
+const mongodb = require("mongodb");
+const cookie = require("cookie-session");
 const http = require( 'http' ),
       fs   = require( 'fs' ),
       // IMPORTANT: you must run `npm install` in the directory for this assignment
@@ -6,11 +9,6 @@ const http = require( 'http' ),
       dir  = 'public/',
       port = 3000
 
-const appdata = [
-  { 'id':1, 'name': 'Pippi', 'link': 'https://cdn.discordapp.com/attachments/428381972545404928/884522236025913374/image0.jpg', 'call': 'ARF', 'type': 'cat' },
-  { 'id':2, 'name': 'Mordecai', 'link': 'https://cdn.discordapp.com/attachments/428381972545404928/884522261237882910/image0.jpg', 'call': 'MEOW', 'type': 'dog' },
-  { 'id':3, 'name': 'Bubba', 'link': 'https://i.imgur.com/Db4cRax.png', 'call': 'I LOVE YOU', 'type':'other'}
-];
 
 const meetingData = {
   "77429c8c-e46d-4886-9fc1-ff69e0880645" : {
@@ -34,8 +32,6 @@ const userData = {
     }
   }
 };
-
-let currId=4;
 
 const server = http.createServer( function( request,response ) {
   if( request.method === 'GET' ) {
@@ -114,25 +110,6 @@ const handleGet = function( request, response ) {
   }
 }
 
-function determineCall(obj, flip) {
-  switch (obj.type) {
-    case 'Dog':
-      call = (flip > 0.5) ? "ARF" : "WOOF";
-      break;
-    case 'Cat':
-      call = (flip > 0.5) ? "MEOW" : "PURR";
-      break;
-    case 'Snake':
-      call = (flip > 0.5) ? "TSSS" : "SSSWEET";
-      break;
-    case 'Bird':
-      call = (flip > 0.5) ? "TWEET" : "CHIRP";
-      break;
-    default:
-      return (flip > 0.5) ? "HEWWO" : "I LOVE YOU";
-  }
-}
-
 const handlePost = function( request, response ) {
   let dataString = ''
 
@@ -141,6 +118,8 @@ const handlePost = function( request, response ) {
   })
 
   request.on( 'end', function() {
+    response.writeHead(200, "Whatever", {'Content-Type': 'text/plain'})
+    /*
     if(request.url === '/submit') {
       let obj = JSON.parse(dataString);
 
@@ -178,6 +157,7 @@ const handlePost = function( request, response ) {
         }
       }
     }
+     */
   })
 }
 
@@ -204,3 +184,30 @@ const sendFile = function( response, filename ) {
 }
 
 server.listen( process.env.PORT || port )
+
+/*
+let currId=4;
+const appdata = [
+  { 'id':1, 'name': 'Pippi', 'link': 'https://cdn.discordapp.com/attachments/428381972545404928/884522236025913374/image0.jpg', 'call': 'ARF', 'type': 'cat' },
+  { 'id':2, 'name': 'Mordecai', 'link': 'https://cdn.discordapp.com/attachments/428381972545404928/884522261237882910/image0.jpg', 'call': 'MEOW', 'type': 'dog' },
+  { 'id':3, 'name': 'Bubba', 'link': 'https://i.imgur.com/Db4cRax.png', 'call': 'I LOVE YOU', 'type':'other'}
+];
+function determineCall(obj, flip) {
+  switch (obj.type) {
+    case 'Dog':
+      call = (flip > 0.5) ? "ARF" : "WOOF";
+      break;
+    case 'Cat':
+      call = (flip > 0.5) ? "MEOW" : "PURR";
+      break;
+    case 'Snake':
+      call = (flip > 0.5) ? "TSSS" : "SSSWEET";
+      break;
+    case 'Bird':
+      call = (flip > 0.5) ? "TWEET" : "CHIRP";
+      break;
+    default:
+      return (flip > 0.5) ? "HEWWO" : "I LOVE YOU";
+  }
+}
+ */
