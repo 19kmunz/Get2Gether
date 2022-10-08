@@ -2,14 +2,11 @@
 <html lang="en">
   <head>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
-    <title>CS4241 Assignment 2</title>
+    <title>Get2Gether</title>
     <meta charset="utf-8">
   </head>
   <body>
-    <h1>Pet Gallery!</h1>
+    <h1 id="title">Example Meeting</h1>
     <form action="">
       <label>Pet Name: <input name="name"></label>
       <label>Image Link: <input name="link"></label>
@@ -24,6 +21,55 @@
       </label>
       <button id="createPet">Post That Pet!</button>
     </form>
+    <form action="">
+      <label>Username:<input name="username"></label>
+      <button id="sign-in" type="button">Sign In</button>
+      <p id="sign-in-confirm">Not Signed In</p>
+    </form>
+    <table id="user-availability">
+      <tr>
+        <th>.</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+      </tr>
+      <tr>
+        <th>9 AM</th>
+        <td><button id="user-09-Monday" type="button" disabled>No</button></td>
+        <td><button id="user-09-Tuesday" type="button" disabled>No</button></td>
+      </tr>
+      <tr>
+        <th>10 AM</th>
+        <td><button id="user-10-Monday" type="button" disabled>No</button></td>
+        <td><button id="user-10-Tuesday" type="button" disabled>No</button></td>
+      </tr>
+      <tr>
+        <th>11 AM</th>
+        <td><button id="user-11-Monday" type="button" disabled>No</button></td>
+        <td><button id="user-11-Tuesday" type="button" disabled>No</button></td>
+      </tr>
+    </table>
+    <table id="total-availability">
+      <tr>
+        <th>.</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+      </tr>
+      <tr>
+        <th>9 AM</th>
+        <td id="total-09-Monday">0</td>
+        <td id="total-09-Tuesday">0</td>
+      </tr>
+      <tr>
+        <th>10 AM</th>
+        <td id="total-10-Monday">0</td>
+        <td id="total-10-Tuesday">0</td>
+      </tr>
+      <tr>
+        <th>11 AM</th>
+        <td id="total-11-Monday">0</td>
+        <td id="total-11-Tuesday">0</td>
+      </tr>
+    </table>
     <ul id="gallery">
       <li>
         <figure>
@@ -48,81 +94,5 @@
       </li>
     </ul>
   </body>
-  <script>
-
-  const refreshGalleryContents = function(json) {
-    let galleryContents = '';
-    for(let i = 0; i < json.length; i++){
-      galleryContents += '<li> <figure> <img class="petTile" src="'+json[i].link+'" alt="Cute picture of '+json[i].name+'"> <figcaption>'+json[i].name+' says '+json[i].call+'</figcaption> </figure> <button id="'+json[i].id+'" onclick="deleteEntry(this.id)" class="delete">Delete</button> </li>';
-    }
-    const gallery = document.querySelector( '#gallery' )
-    gallery.innerHTML = galleryContents;
-  }
-  const deleteEntry = function (clickedId) {
-    body = JSON.stringify({"id": clickedId});
-    fetch( '/delete', {
-      method:'POST',
-      body
-    })
-    .then( function( response ) {
-      return response.json();
-    })
-    .then( function(json) {
-      refreshGalleryContents(json)
-    })
-  }
-  const submit = function( e ) {
-    // prevent default form action from being carried out
-    e.preventDefault()
-
-    const name = document.querySelector( 'input[name="name"]' ),
-            link = document.querySelector( 'input[name="link"]' ),
-            type = document.querySelector( 'select[name="type"]' ),
-          json = { name: name.value, link: link.value, type: type.value },
-          body = JSON.stringify( json )
-
-    fetch( '/submit', {
-      method:'POST',
-      body 
-    })
-    .then( function( response ) {
-      return response.json();
-    })
-    .then( function(json) {
-      refreshGalleryContents(json)
-    })
-
-    return false
-  }
-
-  const submitNoFields = function( e ) {
-
-    const json = { name: '', link: '', type: '' },
-            body = JSON.stringify( json )
-
-    fetch( '/submit', {
-      method:'POST',
-      body
-    })
-    .then( function( response ) {
-      return response.json();
-    })
-    .then( function(json) {
-      refreshGalleryContents(json)
-    })
-
-    return false
-  }
-
-  window.onload = function() {
-    const button = document.querySelector( '#createPet' )
-    button.onclick = submit
-    submitNoFields()
-  }
-
-  window.onpageshow = function () {
-    submitNoFields()
-  }
-
-  </script>
+  <script src="/js/scripts.js"></script>
 </html>

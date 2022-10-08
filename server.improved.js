@@ -12,6 +12,29 @@ const appdata = [
   { 'id':3, 'name': 'Bubba', 'link': 'https://i.imgur.com/Db4cRax.png', 'call': 'I LOVE YOU', 'type':'other'}
 ];
 
+const meetingData = {
+  "77429c8c-e46d-4886-9fc1-ff69e0880645" : {
+    id: "77429c8c-e46d-4886-9fc1-ff69e0880645",
+    name: "Lovely Meeting",
+    days: ["Monday", "Tuesday", "Wednesday"],
+    startTime: 9,
+    endTime: 11,
+  }
+}
+
+const userData = {
+  "6f0f383f-60c2-4138-840b-3dee7c3e901b": {
+    id: "6f0f383f-60c2-4138-840b-3dee7c3e901b",
+    name: "exampleUser",
+    password: "",
+    availability: {
+      Monday: [ {startTime: 9, endTime: 10}],
+      Tuesday: [],
+      Wednesday: [ {startTime: 9, endTime: 9} ]
+    }
+  }
+};
+
 let currId=4;
 
 const server = http.createServer( function( request,response ) {
@@ -22,13 +45,91 @@ const server = http.createServer( function( request,response ) {
   }
 })
 
-const handleGet = function( request, response ) {
-  const filename = dir + request.url.slice( 1 ) 
+function getTotalAvailability(days, startTime, endTime, users) {
+  let totalAvailability = {}
 
+  // Set up availability matrix
+  days.forEach( (day) => {
+    totalAvailability[day] = {};
+    for(let t = startTime; t <= endTime; t++){
+      totalAvailability[day][t] = [];
+    }
+  })
+
+  // For each user, add their availability to the total availability
+  for(let userKey in users){
+    let user = users[userKey];
+    for(let dayKey in user.availability){ // For each day
+      user.availability[dayKey].forEach( (segment) => { // For each segment of availability
+        for(let t = segment.startTime; t <= segment.endTime; t++){ // For each time in the segment
+          totalAvailability[dayKey][t].push(user.name);
+        }
+      })
+    }
+  }
+
+  return totalAvailability;
+}
+
+function getMeetingInfo(meetingId) {
+  return meetingData[meetingId];
+}
+
+const handleGet = function( request, response ) {
+  const filename = dir + request.url.slice( 1 )
   if( request.url === '/' ) {
     sendFile( response, 'public/index.html' )
-  }else{
+  }
+  else if (request.url.toString().slice(0,15) === '/getMeetingData') {
+    let url = request.url.toString()
+    let meetingId = url.slice(-36)
+    if(url.includes('meetingId') && meetingData[meetingId] !== undefined) {
+      let meetingInfo = getMeetingInfo(meetingId);
+      let totalAvailability = getTotalAvailability(meetingInfo.days, meetingInfo.startTime, meetingInfo.endTime, userData)
+
+      response.writeHead(200, "OK", {'Content-Type': 'text/plain'})
+      response.end(JSON.stringify({
+        meetingData: meetingInfo,
+        totalAvailability: totalAvailability
+      }))
+    } else {
+      response.writeHead(400, "Bad Meeting Id For Retrieval", {'Content-Type': 'text/plain'})
+      response.end(JSON.stringify({}))
+    }
+  }
+  else if (request.url.toString().slice(0,12) === '/getUserData') {
+    let url = request.url.toString();
+    let userId = url.slice(-36)
+    if(url.includes('userId') && userData[userId] !== undefined){
+      let user = userData[userId];
+      response.writeHead(200, "OK", {'Content-Type': 'text/plain'})
+      response.end(JSON.stringify(user))
+    } else {
+      response.writeHead(400, "Bad User Id For Retrieval", {'Content-Type': 'text/plain'})
+      response.end(JSON.stringify({}))
+    }
+  }
+  else{
     sendFile( response, filename )
+  }
+}
+
+function determineCall(obj, flip) {
+  switch (obj.type) {
+    case 'Dog':
+      call = (flip > 0.5) ? "ARF" : "WOOF";
+      break;
+    case 'Cat':
+      call = (flip > 0.5) ? "MEOW" : "PURR";
+      break;
+    case 'Snake':
+      call = (flip > 0.5) ? "TSSS" : "SSSWEET";
+      break;
+    case 'Bird':
+      call = (flip > 0.5) ? "TWEET" : "CHIRP";
+      break;
+    default:
+      return (flip > 0.5) ? "HEWWO" : "I LOVE YOU";
   }
 }
 
@@ -42,28 +143,9 @@ const handlePost = function( request, response ) {
   request.on( 'end', function() {
     if(request.url === '/submit') {
       let obj = JSON.parse(dataString);
-      console.log(obj)
 
       if (obj.name !== '' && obj.link !== '' && obj.type !== '') {
-        let flip = Math.random();
-        let call;
-        switch (obj.type) {
-          case 'Dog':
-            call = (flip > 0.5) ? "ARF" : "WOOF";
-            break;
-          case 'Cat':
-            call = (flip > 0.5) ? "MEOW" : "PURR";
-            break;
-          case 'Snake':
-            call = (flip > 0.5) ? "TSSS" : "SSSWEET";
-            break;
-          case 'Bird':
-            call = (flip > 0.5) ? "TWEET" : "CHIRP";
-            break;
-          default:
-            call = (flip > 0.5) ? "HEWWO" : "I LOVE YOU";
-        }
-        obj.call = call;
+        obj.call = determineCall(obj, Math.random());
         obj.id = currId;
         currId++;
         appdata.push(obj)
@@ -74,7 +156,8 @@ const handlePost = function( request, response ) {
         response.writeHead(200, "Request Had No Valid Content to Add, sending Current Unchanged State.", {'Content-Type': 'text/plain'})
         response.end(JSON.stringify(appdata))
       }
-    } else if (request.url === '/delete') {
+    }
+    else if (request.url === '/delete') {
       let idObj = JSON.parse(dataString);
       if(idObj.id < 0 || idObj.id > currId){
         response.writeHead(400, "Bad Id For Deletion", {'Content-Type': 'text/plain'})
