@@ -1,7 +1,8 @@
 const express = require("express");
-const mongodb = require("mongodb");
 const cookie = require("cookie-session");
+const {DAO} = require("./public/js/dao");
 const app = express();
+const dao = new DAO();
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -13,102 +14,14 @@ app.use(
     })
 )
 
-// DB SETUP
-const uri = "mongodb+srv://"+process.env.DBUSERNAME+":"+process.env.DBPASSWORD+"@cluster0.vpqtu1c.mongodb.net";
-
-const client = new mongodb.MongoClient(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
-let collection = null;
-
-client
-    .connect()
-    .then(() => {
-      // will only create collection if it doesn't exist
-      return client.db("Get2Gether").collection("meetings");
-    })
-    .then(__collection => {
-      // store reference to collection
-      collection = __collection;
-    });
-
-const meetingData = {
-  "77429c8c-e46d-4886-9fc1-ff69e0880645" : {
-    id: "77429c8c-e46d-4886-9fc1-ff69e0880645",
-    name: "Lovely Meeting",
-    days: ["Monday", "Tuesday", "Wednesday"],
-    startTime: 9,
-    endTime: 11,
-    users: ["6f0f383f-60c2-4138-840b-3dee7c3e901b"]
-  }
-}
-
-const userData = {
-  "6f0f383f-60c2-4138-840b-3dee7c3e901b": {
-    id: "6f0f383f-60c2-4138-840b-3dee7c3e901b",
-    name: "exampleUser",
-    password: "",
-    availability: {
-      Monday: [ {startTime: 9, endTime: 10}],
-      Tuesday: [],
-      Wednesday: [ {startTime: 9, endTime: 9} ]
-    }
-  }
-};
-
-// DAO
-function generateTotalAvailability(days, startTime, endTime, users) {
-  let totalAvailability = {}
-
-  // Set up availability matrix
-  days.forEach( (day) => {
-    totalAvailability[day] = {};
-    for(let t = startTime; t <= endTime; t++){
-      totalAvailability[day][t] = [];
-    }
-  })
-
-  // For each user, add their availability to the total availability
-  for(let userKey in users){
-    let user = users[userKey];
-    for(let dayKey in user.availability){ // For each day
-      user.availability[dayKey].forEach( (segment) => { // For each segment of availability
-        for(let t = segment.startTime; t <= segment.endTime; t++){ // For each time in the segment
-          totalAvailability[dayKey][t].push(user.name);
-        }
-      })
-    }
-  }
-
-  return totalAvailability;
-}
-
-function getMeeting(meetingId) {
-  if(!meetingId){
-    return undefined
-  }
-  return meetingData[meetingId];
-}
-
-function getUsersForMeeting(meetingId) {
-  let users = [];
-  meetingData[meetingId].users.forEach((userId) => users.push(getUser(userId)))
-  return users;
-}
-
-function getUser(userId) {
-  return userData[userId]
-}
-
 // API
 // get
 app.get("/getMeetingData", (request, response) => {
   let meetingId = request.query.meetingId
-  let meeting = getMeeting(meetingId)
+  let meeting = dao.getMeeting(meetingId)
   if(meeting !== undefined){
-    let users = getUsersForMeeting(meetingId)
-    let totalAvailability = generateTotalAvailability(meeting.days, meeting.startTime, meeting.endTime, users)
+    let users = dao.getUsersForMeeting(meetingId)
+    let totalAvailability = dao.generateTotalAvailability(meeting.days, meeting.startTime, meeting.endTime, users)
 
     response.writeHead(200, "OK", {'Content-Type': 'text/plain'})
     response.end(JSON.stringify({
@@ -123,7 +36,7 @@ app.get("/getMeetingData", (request, response) => {
 
 app.get("/getUserData", (request, response) => {
   let userId = request.query.userId
-  let user = getUser(userId)
+  let user = dao.getUser(userId)
   if(user !== undefined){
     response.writeHead(200, "OK", {'Content-Type': 'text/plain'})
     response.end(JSON.stringify({
@@ -133,6 +46,30 @@ app.get("/getUserData", (request, response) => {
     response.writeHead(400, "Bad User Id For Retrieval", {'Content-Type': 'text/plain'})
     response.end(JSON.stringify({}))
   }
+});
+//post
+app.post("/login", (req, res) => {
+  console.log("User login detected!");
+  client
+      .connect()
+      .then(() => {
+        return client.db("Get2Gether").collection("users");
+      })
+      .then(usersDb => {
+        usersDb.findOne({ username: req.body.username }, function(
+            err,
+            userEntry
+        ) {
+          if (err) throw err;
+          if (userEntry === null) {
+            // if login doesnt exist -> new account
+            createAccount(req, res, usersDb);
+          } else {
+            // already exists, check login
+            checkLoginPasswordAndRedirect(req, res, usersDb);
+          }
+        });
+      });
 });
 
 // Express setup

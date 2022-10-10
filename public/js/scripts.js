@@ -24,6 +24,9 @@ function requestMeetingData(meetingId) {
         })
         .then( function(json) {
             console.log(json)
+            sessionStorage.setItem("days", JSON.stringify(json.meetingData.days))
+            sessionStorage.setItem("startTime", json.meetingData.startTime)
+            sessionStorage.setItem("endTime", json.meetingData.endTime)
             refreshMeetingData(json.meetingData, json.totalAvailability)
         })
 }
@@ -51,18 +54,60 @@ function refreshMeetingData(meetingData, totalAvailability) {
     totalAvailabilityTable.innerHTML = contents;
 }
 
+function requestUserData(userId) {
+    fetch('/getUserData?userId=' + userId)
+        .then( function( response ) {
+            return response.json();
+        })
+        .then( function(json) {
+            console.log(json)
+            sessionStorage.setItem("userId", json.user.userId)
+            refreshUserData(json.user)
+        })
+}
+
+function refreshUserData(userData) {
+    const userAvailabilityTable = document.querySelector('#user-availability')
+    let contents = '';
+    contents += "<tr>"
+    contents += "<th>.</th>"
+    if(sessionStorage.getItem("days")){
+        let days = JSON.parse(sessionStorage.getItem("days"))
+        let startTime = JSON.parse(sessionStorage.getItem("startTime"))
+        let endTime = JSON.parse(sessionStorage.getItem("endTime"))
+        days.forEach((day) => {
+            contents += "<th>" + day + "</th>"
+        })
+        contents += "</tr>";
+        for(let t = startTime; t <= endTime; t++){
+            contents += "<tr>"
+            contents += "<th>" + t + ":00</th>"
+            let tNorm = (t < 10) ? '0'+t : t.toString();
+            days.forEach((day) => {
+                let avail = (userData.availability[day][t]) ? "Yes" : "No"
+                contents += "<td>" +
+                    "<button id=\"user-"+tNorm+"-"+day+"\" type=\"button\">" +
+                    avail +
+                    "</button>" +
+                    "</td>"
+            })
+            contents += "</tr>";
+        }
+        userAvailabilityTable.innerHTML = contents;
+    } else {
+        userAvailabilityTable.innerHTML = "<p>Something went wrong! Local storage does not contain meeting data. Try refreshing.</p>"
+    }
+}
+
 window.onload = function() {
     /*
     const button = document.querySelector( '#createPet' )
     button.onclick = submit
     submitNoFields()
     */
-    requestMeetingData('77429c8c-e46d-4886-9fc1-ff69e0880645')
-}
-
-window.onpageshow = function () {
-    //submitNoFields()
-    requestMeetingData('77429c8c-e46d-4886-9fc1-ff69e0880645')
+    let meetingId = new URLSearchParams(document.location.search).get("meetingId")
+    requestMeetingData(meetingId)
+    requestUserData("6f0f383f-60c2-4138-840b-3dee7c3e901b")
 }
 
 // OLD CODE
