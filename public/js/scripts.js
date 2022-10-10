@@ -42,12 +42,12 @@ function refreshMeetingData(meetingData, totalAvailability) {
         contents += "<th>" + day + "</th>"
     })
     contents += "</tr>";
-    for(let t = meetingData.startTime; t <= meetingData.endTime; t++){
+    for(let t = meetingData.startTime; t <= meetingData.endTime; t+=0.5){
+        let time = getTimeStringFromDouble(t)
         contents += "<tr>"
-        contents += "<th>" + t + ":00</th>"
-        let tNorm = (t < 10) ? '0'+t : t.toString();
+        contents += "<th>" + time + "</th>"
         meetingData.days.forEach((day) => {
-            contents += "<td id=\"total-"+tNorm+"-"+day+"\">" + totalAvailability[day][t].length + "</td>"
+            contents += "<td id=\"total-"+time+"-"+day+"\">" + totalAvailability[day][time].length + "</td>"
         })
         contents += "</tr>";
     }
@@ -79,14 +79,14 @@ function refreshUserData(userData) {
             contents += "<th>" + day + "</th>"
         })
         contents += "</tr>";
-        for(let t = startTime; t <= endTime; t++){
+        for(let t = startTime; t <= endTime; t+= 0.5){
+            let time = getTimeStringFromDouble(t)
             contents += "<tr>"
-            contents += "<th>" + t + ":00</th>"
-            let tNorm = (t < 10) ? '0'+t : t.toString();
+            contents += "<th>" + time + "</th>"
             days.forEach((day) => {
-                let avail = (userData.availability[day][t]) ? "Yes" : "No"
+                let avail = (userData.availability[day][time]) ? "Yes" : "No"
                 contents += "<td>" +
-                    "<button id=\"user-"+tNorm+"-"+day+"\" type=\"button\">" +
+                    "<button id=\"user-"+time+"-"+day+"\" type=\"button\">" +
                     avail +
                     "</button>" +
                     "</td>"

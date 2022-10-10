@@ -1,4 +1,5 @@
 // DB SETUP
+const { getTimeStringFromDouble } = require("./public/js/util");
 const mongodb = require("mongodb");
 
 const uri = "mongodb+srv://"+process.env.DBUSERNAME+":"+process.env.DBPASSWORD+"@cluster0.vpqtu1c.mongodb.net?retryWrites=true&w=majority";
@@ -21,9 +22,9 @@ const userData = {
         name: "exampleUser",
         password: "",
         availability: {
-            Monday: { 9:true, 10:true, 11:false },
+            Monday: { '09:00': true, '09:30': true, '10:00':true,'10:30':true, '11:00' :false },
             Tuesday: {},
-            Wednesday: { 9:true, 10:false, 11:false }
+            Wednesday: { '09:00':true, '09:30':false }
         }
     }
 };
@@ -54,8 +55,9 @@ class DAO {
         // Set up availability matrix
         days.forEach( (day) => {
             totalAvailability[day] = {};
-            for(let t = startTime; t <= endTime; t++){
-                totalAvailability[day][t] = [];
+            for(let t = startTime; t <= endTime; t+=0.5){
+                let time = getTimeStringFromDouble(t);
+                totalAvailability[day][time] = [];
             }
         })
 
