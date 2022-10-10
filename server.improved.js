@@ -1,6 +1,6 @@
 const express = require("express");
 const cookie = require("cookie-session");
-const {DAO} = require("./public/js/dao");
+const {DAO} = require("./dao");
 const app = express();
 const dao = new DAO();
 
