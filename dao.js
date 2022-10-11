@@ -11,7 +11,7 @@ const meetingData = {
         days: ["Monday", "Tuesday", "Wednesday"],
         startTime: 9,
         endTime: 11,
-        users: ["6f0f383f-60c2-4138-840b-3dee7c3e901b"]
+        users: ["6f0f383f-60c2-4138-840b-3dee7c3e901b", "bf5fe9b5-4e0b-4b6b-a17e-41ffd091b449"]
     }
 }
 
@@ -22,9 +22,20 @@ const userData = {
         name: "exampleUser",
         password: "",
         availability: {
-            Monday: { '09:00': true, '09:30': true, '10:00':true,'10:30':true, '11:00' :false },
+            Monday: { '09:00': true, '09:30': true, '10:00':true,'10:30':true },
             Tuesday: {},
             Wednesday: { '09:00':true, '09:30':false }
+        }
+    },
+    "bf5fe9b5-4e0b-4b6b-a17e-41ffd091b449": {
+        id: "bf5fe9b5-4e0b-4b6b-a17e-41ffd091b449",
+        meetingId: "77429c8c-e46d-4886-9fc1-ff69e0880645",
+        name: "testUse",
+        password: "",
+        availability: {
+            Monday: { '09:00': true, '09:30': true, '10:00':true,'10:30':true },
+            Tuesday: {},
+            Wednesday: { '09:00':true }
         }
     }
 };
@@ -72,6 +83,7 @@ class DAO {
                     }
                 }
             }
+            console.log(user)
         }
 
         return totalAvailability;

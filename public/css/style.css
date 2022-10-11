@@ -1,0 +1,10 @@
+.container {
+    user-select: none;
+}
+.user-availability {
+    border: 1px solid red;
+}
+
+.selected {
+    background: blue;
+}
