@@ -4,34 +4,20 @@
     <link rel="stylesheet" href="css/style.css">
     <title>Get2Gether</title>
     <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/@viselect/vanilla/lib/viselect.cjs.js"></script>
+    <script type="text/javascript" src="/js/scripts.js"></script>
+    <script type="text/javascript" src="/js/util.js"></script>
   </head>
   <body>
     <h1 id="title">Example Meeting</h1>
     <form action="">
       <label>Username:<input name="username"></label>
-      <button id="sign-in" type="button">Sign In</button>
+      <button id="sign-in" type="button" onclick="login()">Sign In</button>
       <p id="sign-in-confirm">Not Signed In</p>
     </form>
     <table id="user-availability" class="container">
       <tr>
-        <th>.</th>
-        <th>Monday</th>
-        <th>Tuesday</th>
-      </tr>
-      <tr>
-        <th>9 AM</th>
-        <td><button id="user-09-Monday" type="button" disabled>No</button></td>
-        <td><button id="user-09-Tuesday" type="button" disabled>No</button></td>
-      </tr>
-      <tr>
-        <th>10 AM</th>
-        <td><button id="user-10-Monday" type="button" disabled>No</button></td>
-        <td><button id="user-10-Tuesday" type="button" disabled>No</button></td>
-      </tr>
-      <tr>
-        <th>11 AM</th>
-        <td><button id="user-11-Monday" type="button" disabled>No</button></td>
-        <td><button id="user-11-Tuesday" type="button" disabled>No</button></td>
+        <th>Sign in Above to See Your Availability!</th>
       </tr>
     </table>
     <table id="total-availability">
@@ -56,8 +42,5 @@
         <td id="total-11-Tuesday">0</td>
       </tr>
     </table>
-  <script src="https://cdn.jsdelivr.net/npm/@viselect/vanilla/lib/viselect.cjs.js"></script>
-  <script type="module" src="/js/scripts.js"></script>
-  <script src="/js/util.js"></script>
-
+  </body>
 </html>

@@ -16,11 +16,12 @@ app.use(
 
 // API
 // get
-app.get("/getMeetingData", (request, response) => {
+app.get("/getMeetingData", async (request, response) => {
   let meetingId = request.query.meetingId
-  let meeting = dao.getMeeting(meetingId)
-  if(meeting !== undefined){
-    let users = dao.getUsersForMeeting(meetingId)
+  let meeting = await dao.getMeeting(meetingId)
+  if (meeting) {
+    let cursor = await dao.getUsersForMeeting(meetingId)
+    let users = await cursor.toArray()
     let totalAvailability = dao.generateTotalAvailability(meeting.days, meeting.startTime, meeting.endTime, users)
 
     response.writeHead(200, "OK", {'Content-Type': 'text/plain'})
@@ -34,10 +35,10 @@ app.get("/getMeetingData", (request, response) => {
   }
 });
 
-app.get("/getUserData", (request, response) => {
+app.get("/getUserData", async (request, response) => {
   let userId = request.query.userId
-  let user = dao.getUser(userId)
-  if(user !== undefined){
+  let user = await dao.getUser(userId)
+  if (user !== undefined) {
     response.writeHead(200, "OK", {'Content-Type': 'text/plain'})
     response.end(JSON.stringify({
       user: user
@@ -50,6 +51,7 @@ app.get("/getUserData", (request, response) => {
 //post
 app.post("/login", (req, res) => {
   console.log("User login detected!");
+  return
   client
       .connect()
       .then(() => {

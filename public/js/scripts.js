@@ -1,7 +1,102 @@
 console.log("Welcome to Get2Gether!")
 
-function htmlElementsToUserData(stored) {
-    //[td#user-09:00-Monday.user-availability.selected, td#user-09:00-Wednesday.user-availability.selected, td#user-10:00-Monday.user-availability.selected, td#user-10:30-Monday.user-availability.selected]//
+
+let selection;
+
+function setupSelection() {
+    return new SelectionArea({
+        selectables: ["tr > .user-availability"],
+        boundaries: [".container"]
+    })
+        .on("move",
+            ({
+                 store: {
+                     changed: {added, removed}
+                 }
+             }) => {
+                scrollable = false;
+
+                for (const el of added) {
+                    el.classList.add("selected");
+
+                    let split = el.id.split("-");
+                    let time = split[1];
+                    let day = split[2];
+                    let totalId = "total-" + time + "-" + day
+                    addCurrentUserToTotalAvailability(totalId)
+                }
+
+                for (const el of removed) {
+                    el.classList.remove("selected");
+
+                    let split = el.id.split("-");
+                    let time = split[1];
+                    let day = split[2];
+                    let totalId = "total-" + time + "-" + day
+                    removeCurrentUserFromTotalAvailability(totalId)
+                }
+            }
+        )
+        .on("stop", ({store: {stored}}) => {
+            scrollable = true;
+            let userData = convertHtmlElementsToUserData(stored)
+            refreshUserDataView(userData)
+        });
+}
+
+function addCurrentUserToTotalAvailability(totalId) {
+    let element = document.getElementById(totalId)
+    let arr = element.dataset.users.split(',')
+    if(arr[0] === ""){
+        arr = [];
+    }
+    if(!arr.includes(sessionStorage.getItem('userName'))){
+        arr.push(sessionStorage.getItem('userName'))
+        element.innerHTML = arr.length.toString()
+        element.dataset.users = arr.toString();
+    }
+}
+
+function removeCurrentUserFromTotalAvailability(totalId) {
+    let element = document.getElementById(totalId)
+    let arr = element.dataset.users.split(',')
+    let index = arr.indexOf(sessionStorage.getItem('userName'))
+    if(index > -1){
+        arr.splice(index, 1)
+        element.innerHTML = arr.length.toString()
+        element.dataset.users = arr.toString();
+    }
+}
+
+let scrollable = true;
+document.addEventListener('touchmove', (e) => {
+        if (! scrollable) {
+            e.preventDefault();
+        }
+    }, { passive:false });
+
+function login() {
+    console.log("Clicked!")
+    const username = document.querySelector('input[name="username"]').value
+    if(!username || username === '') { return }
+    const body = JSON.stringify({'username':username.value, 'meetingId': sessionStorage.getItem('meetingId')})
+
+    fetch('/login', {
+        method:'POST',
+        body
+    })
+        .then( function(response) {
+            return response.json()
+        })
+        .then( function(response) {
+            sessionStorage.setItem("userId", response.user.id)
+            sessionStorage.setItem("userName", response.user.name)
+            refreshUserDataView(response.user)
+            selection = setupSelection();
+        })
+}
+
+function convertHtmlElementsToUserData(stored) {
     let availability = {}
 
     // Set up availability matrix
@@ -21,59 +116,7 @@ function htmlElementsToUserData(stored) {
     };
 }
 
-let selection = new SelectionArea({
-        selectables: ["tr > .user-availability"],
-        boundaries: [".container"]
-    })
-        .on("move",
-            ({
-                 store: {
-                     changed: {added, removed}
-                 }
-             }) => {
-                scrollable = false;
-                for (const el of added) {
-                    el.classList.add("selected");
-                }
-
-                for (const el of removed) {
-                    el.classList.remove("selected");
-                }
-            }
-        )
-        .on("stop", ({store: {stored}}) => {
-            scrollable = true;
-            let userData = htmlElementsToUserData(stored)
-            refreshUserDataView(userData)
-            //console.log(stored)
-        });
-let scrollable = true;
-
-let preventScrollOnMobile = function(e) {
-    if (! scrollable) {
-        e.preventDefault();
-    }
-}
-
-document.addEventListener('touchmove', preventScrollOnMobile, { passive:false });
-
-const login = function(e) {
-    e.preventDefault()
-    const username = document.querySelector('input[name="username"]')
-    const body = JSON.stringify(username.value)
-
-    fetch('/login', {
-        method:'POST',
-        body
-    })
-        .then( function(response) {
-            return response.json()
-        })
-        .then( function(response) {
-            refreshMeetingDataView(response.meetingData, response.totalAvailability)
-        })
-}
-
+// Backend Interaction + View Refreshes
 function requestMeetingData(meetingId) {
     fetch('/getMeetingData?meetingId=' + meetingId)
         .then( function( response ) {
@@ -104,7 +147,7 @@ function refreshMeetingDataView(meetingData, totalAvailability) {
         contents += "<tr>"
         contents += "<th>" + time + "</th>"
         meetingData.days.forEach((day) => {
-            contents += "<td id=\"total-"+time+"-"+day+"\">" +
+            contents += "<td id=\"total-"+time+"-"+day+"\" data-users='"+totalAvailability[day][time]+"'>" +
                 (( t !== meetingData.endTime) ? totalAvailability[day][time].length : "") +
                 "</td>"
         })
@@ -121,6 +164,7 @@ function requestUserData(userId) {
         .then( function(json) {
             console.log(json)
             sessionStorage.setItem("userId", json.user.id)
+            sessionStorage.setItem("userName", json.user.name)
             refreshUserDataView(json.user)
         })
 }
@@ -152,9 +196,11 @@ function refreshUserDataView(userData) {
         }
         userAvailabilityTable.innerHTML = contents;
 
-        selection.resolveSelectables();
-        selection.clearSelection();
-        selection.select('.selected', true);
+        if(selection) {
+            selection.resolveSelectables();
+            selection.clearSelection();
+            selection.select('.selected', true);
+        }
     } else {
         userAvailabilityTable.innerHTML = "<p>Something went wrong! Local storage does not contain meeting data. Try refreshing.</p>"
     }
@@ -163,7 +209,8 @@ function refreshUserDataView(userData) {
 window.onload = function() {
     let meetingId = new URLSearchParams(document.location.search).get("meetingId")
     requestMeetingData(meetingId)
-    requestUserData("6f0f383f-60c2-4138-840b-3dee7c3e901b")
+    //requestUserData("63433238212c3e62680e0171")
+    //selection = setupSelection()
 }
 
 // OLD CODE

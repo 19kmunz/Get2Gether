@@ -1,44 +1,9 @@
 // DB SETUP
 const { getTimeStringFromDouble } = require("./public/js/util");
 const mongodb = require("mongodb");
+const {ObjectId} = require("mongodb");
 
 const uri = "mongodb+srv://"+process.env.DBUSERNAME+":"+process.env.DBPASSWORD+"@cluster0.vpqtu1c.mongodb.net?retryWrites=true&w=majority";
-
-const meetingData = {
-    "77429c8c-e46d-4886-9fc1-ff69e0880645" : {
-        id: "77429c8c-e46d-4886-9fc1-ff69e0880645",
-        name: "Lovely Meeting",
-        days: ["Monday", "Tuesday", "Wednesday"],
-        startTime: 9,
-        endTime: 11,
-        users: ["6f0f383f-60c2-4138-840b-3dee7c3e901b", "bf5fe9b5-4e0b-4b6b-a17e-41ffd091b449"]
-    }
-}
-
-const userData = {
-    "6f0f383f-60c2-4138-840b-3dee7c3e901b": {
-        id: "6f0f383f-60c2-4138-840b-3dee7c3e901b",
-        meetingId: "77429c8c-e46d-4886-9fc1-ff69e0880645",
-        name: "exampleUser",
-        password: "",
-        availability: {
-            Monday: { '09:00': true, '09:30': true, '10:00':true,'10:30':true },
-            Tuesday: {},
-            Wednesday: { '09:00':true, '09:30':false }
-        }
-    },
-    "bf5fe9b5-4e0b-4b6b-a17e-41ffd091b449": {
-        id: "bf5fe9b5-4e0b-4b6b-a17e-41ffd091b449",
-        meetingId: "77429c8c-e46d-4886-9fc1-ff69e0880645",
-        name: "testUse",
-        password: "",
-        availability: {
-            Monday: { '09:00': true, '09:30': true, '10:00':true,'10:30':true },
-            Tuesday: {},
-            Wednesday: { '09:00':true }
-        }
-    }
-};
 
 class DAO {
     constructor() {
@@ -46,7 +11,6 @@ class DAO {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
-        this.collection = null;
         this.client
             .connect()
             .then(() => {
@@ -90,20 +54,18 @@ class DAO {
     }
 
     getMeeting(meetingId) {
-        if(!meetingId){
+        if (!meetingId) {
             return undefined
         }
-        return meetingData[meetingId];
+        return this.client.db("Get2Gether").collection("meetings").findOne( {_id: ObjectId(meetingId)});
     }
 
     getUsersForMeeting(meetingId) {
-        let users = [];
-        meetingData[meetingId].users.forEach((userId) => users.push(this.getUser(userId)))
-        return users;
+        return this.client.db("Get2Gether").collection("users").find( {meetingId: ObjectId(meetingId)});
     }
 
     getUser(userId) {
-        return userData[userId]
+        return this.client.db("Get2Gether").collection("users").findOne( {_id: ObjectId(userId)});
     }
 }
 
