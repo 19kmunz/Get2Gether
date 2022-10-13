@@ -182,13 +182,32 @@ function refreshMeetingDataView(meetingData, totalAvailability) {
         contents += "<tr>"
         contents += "<th>" + time + "</th>"
         meetingData.days.forEach((day) => {
-            contents += "<td id=\"total-"+time+"-"+day+"\" data-users='"+totalAvailability[day][time]+"'>" +
+            contents += "<td " +
+                "id=\"total-"+time+"-"+day+"\" " +
+                "data-users='"+totalAvailability[day][time] + "'" +
+                " onmouseover='updateHoverToAvailability(this)'" +
+                " onmouseout='updateHoverToDefault()'" +
+                ">" +
                 (( t !== meetingData.endTime) ? totalAvailability[day][time].length : "") +
                 "</td>"
         })
         contents += "</tr>";
     }
     totalAvailabilityTable.innerHTML = contents;
+}
+
+function updateHoverToAvailability(element){
+    let split = element.id.split('-');
+    let day = split[2];
+    let time = split[1];
+    let users = element.dataset.users.replace(',', ', ')
+    let hoverElement = document.getElementById("hover")
+    hoverElement.innerText = "Users available at " + time + " on " + day + ": " + users
+}
+
+function updateHoverToDefault() {
+    let hoverElement = document.getElementById("hover")
+    hoverElement.innerText = "Hover To See Availability!"
 }
 
 function requestUserData(userId) {
