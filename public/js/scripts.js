@@ -41,6 +41,7 @@ function setupSelection() {
             scrollable = true;
             let userData = convertHtmlElementsToUserData(stored)
             refreshUserDataView(userData)
+            sendUserData(userData)
         });
 }
 
@@ -75,24 +76,40 @@ document.addEventListener('touchmove', (e) => {
         }
     }, { passive:false });
 
+function updateSessionUserVariables(userId, username) {
+    sessionStorage.setItem("userId", userId)
+    sessionStorage.setItem("userName", username)
+}
+
+function updateSignInConfirmationHTML(username) {
+    const confirm = document.getElementById("sign-in-confirm")
+    confirm.innerText = "Signed In As: " + username;
+    const button = document.getElementById("sign-in")
+    button.disabled = true;
+}
+
 function login() {
-    console.log("Clicked!")
     const username = document.querySelector('input[name="username"]').value
     if(!username || username === '') { return }
-    const body = JSON.stringify({'username':username.value, 'meetingId': sessionStorage.getItem('meetingId')})
+    const body = JSON.stringify({username: username, meetingId: sessionStorage.getItem('meetingId')})
+    console.log(body)
 
     fetch('/login', {
         method:'POST',
-        body
+        body,
+        headers:{
+            "Content-Type": "application/json"
+        }
     })
         .then( function(response) {
             return response.json()
         })
         .then( function(response) {
-            sessionStorage.setItem("userId", response.user.id)
-            sessionStorage.setItem("userName", response.user.name)
-            refreshUserDataView(response.user)
+            console.log(response)
             selection = setupSelection();
+            refreshUserDataView(response.user)
+            updateSignInConfirmationHTML(username);
+            updateSessionUserVariables(response.user._id, response.user.name);
         })
 }
 
@@ -117,6 +134,24 @@ function convertHtmlElementsToUserData(stored) {
 }
 
 // Backend Interaction + View Refreshes
+function sendUserData(userData) {
+    let body = JSON.stringify(userData)
+    fetch( '/sendUserData', {
+        method:'POST',
+        body,
+        headers:{
+            "Content-Type": "application/json"
+        }
+    })
+        .then( function( response ) {
+            return response.json();
+        })
+        .then( function(json) {
+            if(json.modifiedCount === 0) {
+                console.log("WARNING: Modified count is 0 for update with " + userData.userId +". This happens for unsetting, if this was a set then it is fine.")
+            }
+        })
+}
 function requestMeetingData(meetingId) {
     fetch('/getMeetingData?meetingId=' + meetingId)
         .then( function( response ) {
@@ -188,7 +223,7 @@ function refreshUserDataView(userData) {
             contents += "<th>" + time + "</th>"
             if(t !== endTime) {
                 days.forEach((day) => {
-                    let avail = (userData.availability[day][time]) ? " selected" : ""
+                    let avail = (userData.availability[day]) ? ((userData.availability[day][time]) ? " selected" : "") : ""
                     contents += "<td id=\"user-" + time + "-" + day + "\" class=\"user-availability" + avail + "\">" + avail + "</td>"
                 })
             }
@@ -208,81 +243,8 @@ function refreshUserDataView(userData) {
 
 window.onload = function() {
     let meetingId = new URLSearchParams(document.location.search).get("meetingId")
+    sessionStorage.setItem('meetingId', meetingId)
     requestMeetingData(meetingId)
     //requestUserData("63433238212c3e62680e0171")
     //selection = setupSelection()
 }
-
-// OLD CODE
-/*
-
-
-
-
-
-const submit = function( e ) {
-    // prevent default form action from being carried out
-    e.preventDefault()
-
-    const name = document.querySelector( 'input[name="name"]' ),
-        link = document.querySelector( 'input[name="link"]' ),
-        type = document.querySelector( 'select[name="type"]' ),
-        json = { name: name.value, link: link.value, type: type.value },
-        body = JSON.stringify( json )
-
-    fetch( '/submit', {
-        method:'POST',
-        body
-    })
-        .then( function( response ) {
-            return response.json();
-        })
-        .then( function(json) {
-            refreshGalleryContents(json)
-        })
-
-    return false
-}
-
-const submitNoFields = function( e ) {
-
-    const json = { name: '', link: '', type: '' },
-        body = JSON.stringify( json )
-
-    fetch( '/submit', {
-        method:'POST',
-        body
-    })
-        .then( function( response ) {
-            return response.json();
-        })
-        .then( function(json) {
-            refreshGalleryContents(json)
-        })
-
-    return false
-}
-
-const refreshGalleryContents = function(json) {
-    let galleryContents = '';
-    for(let i = 0; i < json.length; i++){
-        galleryContents += '<li> <figure> <img class="petTile" src="'+json[i].link+'" alt="Cute picture of '+json[i].name+'"> <figcaption>'+json[i].name+' says '+json[i].call+'</figcaption> </figure> <button id="'+json[i].id+'" onclick="deleteEntry(this.id)" class="delete">Delete</button> </li>';
-    }
-    const gallery = document.querySelector( '#gallery' )
-    gallery.innerHTML = galleryContents;
-}
-const deleteEntry = function (clickedId) {
-    body = JSON.stringify({"id": clickedId});
-    fetch( '/delete', {
-        method:'POST',
-        body
-    })
-        .then( function( response ) {
-            return response.json();
-        })
-        .then( function(json) {
-            refreshGalleryContents(json)
-        })
-}
-
- */

@@ -47,7 +47,6 @@ class DAO {
                     }
                 }
             }
-            console.log(user)
         }
 
         return totalAvailability;
@@ -66,6 +65,18 @@ class DAO {
 
     getUser(userId) {
         return this.client.db("Get2Gether").collection("users").findOne( {_id: ObjectId(userId)});
+    }
+
+    getUserFromUsername(username, meetingId) {
+        return this.client.db("Get2Gether").collection("users").findOne( {name: username, meetingId: ObjectId(meetingId)});
+    }
+
+    updateUserAvailability(userId, availability){
+        return this.client.db("Get2Gether").collection("users").updateOne({_id: ObjectId(userId)}, {$set:{availability: availability}})
+    }
+
+    createUser(username, meetingId) {
+        return this.client.db("Get2Gether").collection("users").insertOne( {meetingId: meetingId, name: username, availability: {}, password: ""})
     }
 }
 
