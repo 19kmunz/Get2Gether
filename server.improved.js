@@ -52,6 +52,7 @@ app.get("/getUserData", (request, response) => {
     }
   })
 });
+
 //post
 app.post("/login", bodyParser.json(), (request, response) => {
   console.log("User login detected!");
@@ -96,6 +97,32 @@ app.post("/sendUserData", bodyParser.json(), (request, response) => {
       console.log(res)
     }
   })
+});
+
+app.post("/createMeeting", bodyParser.json(), (request, response) => {
+  console.log("Meeting data detected!");
+  dao.createMeeting(request.body.name, request.body.days, request.body.startTime, request.body.endTime).then(res => {
+    if (res.acknowledged) {
+      response.writeHead(200, "OK", {'Content-Type': 'text/plain'})
+      response.end(JSON.stringify({
+        insertedId: res.insertedId
+      }))
+    } else {
+      response.writeHead(400, "Something went wrong inserting the meeting: ${request.body}", {'Content-Type': 'text/plain'})
+      response.end(JSON.stringify({}))
+      console.log(res)
+    }
+  })
+});
+
+// add some middleware so non-id pages are sent to create
+app.use(function(req, res, next) {
+  console.log(req.originalUrl)
+  if (req.originalUrl === '/') {
+    res.sendFile(__dirname + "/public/create.html");
+  } else {
+    next()
+  }
 });
 
 // Express setup

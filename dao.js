@@ -76,7 +76,11 @@ class DAO {
     }
 
     createUser(username, meetingId) {
-        return this.client.db("Get2Gether").collection("users").insertOne( {meetingId: meetingId, name: username, availability: {}, password: ""})
+        return this.client.db("Get2Gether").collection("users").insertOne( {meetingId: ObjectId(meetingId), name: username, availability: {}, password: ""})
+    }
+
+    createMeeting(name, days, startTime, endTime) {
+        return this.client.db("Get2Gether").collection("meetings").insertOne( {name: name, days: days, startTime: startTime, endTime: endTime, users: []})
     }
 }
 

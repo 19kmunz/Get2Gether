@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Get2Gether</title>
+    <link type="image/png" sizes="16x16" rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
+
+    <!-- Datepicker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+</head>
+<body class="d-flex flex-column align-content-center text-center gap-2">
+    <h1 class="mb-0">Welcome to Get2Gether</h1>
+    <!-- Title Input -->
+    <label class="mx-3">
+        <input id="eventTitle" maxlength="50" class="text-center form-control form-control-lg"  name="title" placeholder="New Event Title"/>
+    </label>
+    <div class="d-flex justify-content-evenly flex-wrap gap-5">
+        <!-- Dates Input -->
+        <div class="d-flex flex-column gap-2">
+            <h2>What days work?</h2>
+            <!-- Date Type Toggle -->
+            <ul class="list-group list-group-horizontal d-flex justify-content-center" >
+                <li id="listGroupDates" class="list-group-item active" data-bs-toggle="list" href="#dates-container" role="tab">Specific Dates</li>
+                <li id="listGroupDays" class="list-group-item" data-bs-toggle="list" href="#days-container" role="tab">Days of the Week</li>
+            </ul>
+            <div  class="tab-content">
+                <!-- Specific Dates -->
+                <div id="dates-container" class="tab-pane show active">
+                    <div id="datepicker" class="input-daterange input-group">
+                        <input type="text" class="input-group-sm form-control" name="start" id="start" />
+                        <span class="input-group-text">to</span>
+                        <input type="text" class="input-group-sm form-control" name="end" id="end"/>
+                    </div>
+                </div>
+                <!-- Weekly Dates -->
+                <ul id="days-container" class="list-group tab-pane border" >
+                    <li class="list-group-item" data-bs-toggle="button">Monday</li>
+                    <li class="list-group-item" data-bs-toggle="button">Tuesday</li>
+                    <li class="list-group-item" data-bs-toggle="button">Wednesday</li>
+                    <li class="list-group-item" data-bs-toggle="button">Thursday</li>
+                    <li class="list-group-item" data-bs-toggle="button">Friday</li>
+                    <li class="list-group-item" data-bs-toggle="button">Saturday</li>
+                    <li class="list-group-item" data-bs-toggle="button">Sunday</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Times Input -->
+        <div class="d-flex flex-column gap-2">
+            <h2>What times work?</h2>
+            <select id="startTime" class="form-select" aria-label="Start time select">
+                <option value="0">00:00</option>
+                <option value="1">01:00</option>
+                <option value="2">02:00</option>
+                <option value="3">03:00</option>
+                <option value="4">04:00</option>
+                <option value="5">05:00</option>
+                <option value="6">06:00</option>
+                <option value="7">07:00</option>
+                <option value="8">08:00</option>
+                <option value="9" selected>09:00</option>
+                <option value="10">10:00</option>
+                <option value="11">11:00</option>
+                <option value="12">12:00</option>
+                <option value="13">13:00</option>
+                <option value="14">14:00</option>
+                <option value="15">15:00</option>
+                <option value="16">16:00</option>
+                <option value="17">17:00</option>
+                <option value="18">18:00</option>
+                <option value="19">19:00</option>
+                <option value="20">20:00</option>
+                <option value="21">21:00</option>
+                <option value="22">22:00</option>
+                <option value="23">23:00</option>
+                <option value="24">24:00</option>
+            </select>
+            <p class="mb-0">until</p>
+            <select id="endTime" class="form-select" aria-label="End time select">
+                <option value="0">00:00</option>
+                <option value="1">01:00</option>
+                <option value="2">02:00</option>
+                <option value="3">03:00</option>
+                <option value="4">04:00</option>
+                <option value="5">05:00</option>
+                <option value="6">06:00</option>
+                <option value="7">07:00</option>
+                <option value="8">08:00</option>
+                <option value="9">09:00</option>
+                <option value="10">10:00</option>
+                <option value="11">11:00</option>
+                <option value="12">12:00</option>
+                <option value="13">13:00</option>
+                <option value="14">14:00</option>
+                <option value="15">15:00</option>
+                <option value="16">16:00</option>
+                <option value="17" selected>17:00</option>
+                <option value="18">18:00</option>
+                <option value="19">19:00</option>
+                <option value="20">20:00</option>
+                <option value="21">21:00</option>
+                <option value="22">22:00</option>
+                <option value="23">23:00</option>
+                <option value="24">24:00</option>
+            </select>
+        </div>
+    </div>
+    <!-- Alert-->
+    <div class="col-8 align-self-center">
+        <div id = "alert_placeholder"></div>
+    </div>
+    <!-- Creat Button-->
+    <button id="create" type="button" class="btn btn-primary mb-5 align-self-center col-7">Create Your Event!</button>
+
+    <!-- Script -->
+    <script type="text/javascript">
+        // Add alert
+        let createAlert = function () {
+            $('#alert_placeholder').html('<div id="alert" class="alert alert-danger alert-dismissible fade show" role="alert">Not all fields were properly filled out, try again! <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div>')
+        }
+
+        // Make Array of Specific Date String
+        let produceDays = function (startDay, endDay) {
+            let arr = [];
+            let dt = startDay;
+
+            while (dt <= endDay) {
+                arr.push(new Date(dt));
+                dt.setDate(dt.getDate() + 1);
+            }
+
+            return arr.map(date => date.toDateString());
+        }
+
+        let validEvent = function (json) {
+            return !!(json.name
+                && json.days
+                && json.days.length > 0
+                && json.startTime
+                && json.endTime
+                && !isNaN(json.startTime) // is a number
+                && !isNaN(json.endTime));
+        }
+
+        // Setup DatePicker
+        $(document).ready(function(){
+            $('#dates-container .input-daterange').datepicker({
+                todayHighlight: true
+            });
+        });
+
+        // Create On Click - Create valid event
+        $('#create').click(function() {
+            // Create the Event
+            let json = {}
+            let alert = false;
+            // Event Name
+            let eventTitle=$('#eventTitle')
+            if(eventTitle.length > 0 && eventTitle.val() !== '')
+            {
+                // Is Valid
+                json.name = eventTitle.val()
+                eventTitle.removeClass('is-invalid')
+            } else {
+                eventTitle.addClass('is-invalid')
+                alert = true
+            }
+
+            // Dates
+            let isDates=$('#listGroupDates').hasClass('active')
+            // Specific Dates
+            if (isDates) {
+                // Dates
+                let start = $('#start')
+                let end = $('#end')
+                if (start.length > 0 && start.val() !== '' && end.length > 0 && end.val() !== '') {
+                    // Is Valid
+                    json.days = produceDays(new Date(start.val()), new Date(end.val()))
+                    $('#datepicker').removeClass('is-invalid')
+                } else {
+                    if (start.length === 0 || start.val() === '') {
+                        start.addClass('is-invalid')
+                    }
+                    if (end.length === 0 || end.val() === '') {
+                        end.addClass('is-invalid')
+                    }
+                    alert = true
+                }
+            }
+            // General Dates
+            else {
+                // Days
+                let daysItems = $("#days-container li");
+                let daysList = [];
+                daysItems.each(function(idx, li) {
+                    let name = li.valueOf().innerText;
+                    if(this.classList.contains('active')){
+                        daysList.push(name)
+                    }
+                });
+                if(daysList.length > 0) {
+                    // Is Valid
+                    json.days = daysList
+                    $("#days-container").removeClass("border-danger")
+                } else {
+                    $("#days-container").addClass("border-danger")
+                    alert = true;
+                }
+            }
+
+            // Times
+            let startTime = $('#startTime')
+            let startTimeVal = parseInt(startTime.val());
+            let endTime = $('#endTime')
+            let endTimeVal = parseInt(endTime.val());
+            if(startTimeVal <= endTimeVal){
+                // Is Valid
+                json.startTime = startTimeVal
+                json.endTime = endTimeVal
+                startTime.removeClass('is-invalid')
+                endTime.removeClass('is-invalid')
+            } else {
+                startTime.addClass('is-invalid')
+                endTime.addClass('is-invalid')
+                alert = true
+            }
+            if(alert || !validEvent(json)) {
+                createAlert()
+            } else {
+                $('#alert_placeholder').html('');
+                // TODO: Send to mysql
+                let body = JSON.stringify(json)
+                fetch('/createMeeting', {
+                    method:'POST',
+                    body,
+                    headers:{
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then( function(response) {
+                    return response.json()
+                })
+                .then( function(response) {
+                    // TODO: Redirect!
+                    console.log(response)
+                    window.location.replace(window.location.origin + "?meetingId=" + response.insertedId)
+                })
+            }
+        })
+    </script>
+</body>
+</html>
