@@ -1,13 +1,33 @@
 /* index */
-.container {
+:root{
+    --blue-r: 13;
+    --blue-g: 110;
+    --blue-b: 253;
+}
+.no-select {
     user-select: none;
 }
-.user-availability {
-    border: 1px solid red;
+.availability{
+    border-color: white;
+    table-layout: fixed;
+}
+
+.availability th {
+    overflow:hidden;
+}
+
+.availability thead th:nth-child(1){
+    width: 5em !important;
+}
+.availability tr th:nth-child(1){
+    width: 5em !important;
+}
+.availability td {
+    border: 1px solid var(--bs-blue);
 }
 
 .selected {
-    background: blue;
+    background: rgba(var(--blue-r),var(--blue-g),var(--blue-b),1) !important;
 }
 
 .datepicker-inline {

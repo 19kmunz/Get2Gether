@@ -13,40 +13,48 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" >
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" ></script>
   </head>
-  <body>
-    <h1 id="title">Example Meeting</h1>
+  <body class="text-center" >
+    <h1 class="mx-auto my-3" id="title">Example Meeting</h1>
     <div>
-      <label>Username:<input name="username"></label>
-      <button id="sign-in" type="button" onclick="login()">Sign In</button>
+      <div>
+        <label><input name="username" id="username" class="text-center form-control" placeholder="Username"/></label>
+        <button id="sign-in" type="button" class="btn btn-primary text-center mb-1" onclick="login()">Sign In</button>
+      </div>
       <p id="sign-in-confirm">Not Signed In</p>
     </div>
-    <table id="user-availability" class="container">
-      <tr>
-        <th>Sign in Above to See Your Availability!</th>
-      </tr>
-    </table>
-    <table id="total-availability">
-      <tr>
-        <th>.</th>
-        <th>Monday</th>
-        <th>Tuesday</th>
-      </tr>
-      <tr>
-        <th>9 AM</th>
-        <td id="total-09-Monday">0</td>
-        <td id="total-09-Tuesday">0</td>
-      </tr>
-      <tr>
-        <th>10 AM</th>
-        <td id="total-10-Monday">0</td>
-        <td id="total-10-Tuesday">0</td>
-      </tr>
-      <tr>
-        <th>11 AM</th>
-        <td id="total-11-Monday">0</td>
-        <td id="total-11-Tuesday">0</td>
-      </tr>
-    </table>
+    <div class="row">
+      <div class="col mx-3">
+        <table id="user-availability" class="availability table table-borderless no-select ">
+          <tr>
+            <th>Sign in Above to See Your Availability!</th>
+          </tr>
+        </table>
+      </div>
+      <div class="col mx-3">
+        <table id="total-availability" class="availability table table-borderless">
+          <tr>
+            <th>.</th>
+            <th>Monday</th>
+            <th>Tuesday</th>
+          </tr>
+          <tr>
+            <th>9 AM</th>
+            <td id="total-09-Monday">0</td>
+            <td id="total-09-Tuesday">0</td>
+          </tr>
+          <tr>
+            <th>10 AM</th>
+            <td id="total-10-Monday">0</td>
+            <td id="total-10-Tuesday">0</td>
+          </tr>
+          <tr>
+            <th>11 AM</th>
+            <td id="total-11-Monday">0</td>
+            <td id="total-11-Tuesday">0</td>
+          </tr>
+        </table>
+      </div>
+    </div>
     <div id="hover">Hover To See Availability!</div>
   </body>
 </html>

@@ -2,11 +2,13 @@ console.log("Welcome to Get2Gether!")
 
 
 let selection;
+let columnSize = 5;
+sessionStorage.setItem('max', 1)
 
 function setupSelection() {
     return new SelectionArea({
         selectables: ["tr > .user-availability"],
-        boundaries: [".container"]
+        boundaries: [".no-select"]
     })
         .on("move",
             ({
@@ -55,6 +57,7 @@ function addCurrentUserToTotalAvailability(totalId) {
         arr.push(sessionStorage.getItem('userName'))
         element.innerHTML = arr.length.toString()
         element.dataset.users = arr.toString();
+        element.style.background = "rgba(var(--blue-r),var(--blue-g),var(--blue-b)," + (1/sessionStorage.getItem('max')) * element.dataset.users.length + ")"
     }
 }
 
@@ -152,6 +155,7 @@ function sendUserData(userData) {
             }
         })
 }
+
 function requestMeetingData(meetingId) {
     fetch('/getMeetingData?meetingId=' + meetingId)
         .then( function( response ) {
@@ -167,29 +171,42 @@ function requestMeetingData(meetingId) {
 }
 
 function refreshMeetingDataView(meetingData, totalAvailability) {
+    let max = 0
+    for (let day in totalAvailability) {
+        for(let time in totalAvailability[day]) {
+            max = Math.max(max, totalAvailability[day][time].length)
+        }
+    }
+    sessionStorage.setItem("max", max.toString())
+
     const title = document.querySelector('#title')
     const totalAvailabilityTable = document.querySelector('#total-availability')
+    totalAvailabilityTable.style.minWidth = meetingData.days.length * columnSize + "rem"
     title.textContent = meetingData.name
     let contents = '';
-    contents += "<tr>"
-    contents += "<th>.</th>"
+    contents += "<thead>"
+    contents += "<th></th>"
     meetingData.days.forEach((day) => {
         contents += "<th>" + day + "</th>"
     })
-    contents += "</tr>";
+    contents += "</thead>";
     for(let t = meetingData.startTime; t <= meetingData.endTime; t+=0.5){
         let time = getTimeStringFromDouble(t)
         contents += "<tr>"
         contents += "<th>" + time + "</th>"
         meetingData.days.forEach((day) => {
-            contents += "<td " +
-                "id=\"total-"+time+"-"+day+"\" " +
-                "data-users='"+totalAvailability[day][time] + "'" +
-                " onmouseover='updateHoverToAvailability(this)'" +
-                " onmouseout='updateHoverToDefault()'" +
-                ">" +
-                (( t !== meetingData.endTime) ? totalAvailability[day][time].length : "") +
-                "</td>"
+            let users = totalAvailability[day][time]
+            if (t !== meetingData.endTime) {
+                contents += "<td " +
+                    "id=\"total-" + time + "-" + day + "\" " +
+                    "data-users='" + users + "' " +
+                    "data-length='" + users.length + "' " +
+                    "style=\"background: rgba(var(--blue-r),var(--blue-g),var(--blue-b)," + (1 / max) * users.length + ");\" " +
+                    "onmouseover='updateHoverToAvailability(this)' " +
+                    "onmouseout='updateHoverToDefault()'" +
+                    ">" + users.length +
+                    "</td>"
+            }
         })
         contents += "</tr>";
     }
@@ -225,17 +242,18 @@ function requestUserData(userId) {
 
 function refreshUserDataView(userData) {
     const userAvailabilityTable = document.querySelector('#user-availability')
-    let contents = '';
-    contents += "<tr>"
-    contents += "<th>.</th>"
     if(sessionStorage.getItem("days")){
         let days = JSON.parse(sessionStorage.getItem("days"))
         let startTime = JSON.parse(sessionStorage.getItem("startTime"))
         let endTime = JSON.parse(sessionStorage.getItem("endTime"))
+        userAvailabilityTable.style.minWidth = days.length * columnSize + "rem";
+        let contents = '';
+        contents += "<thead>"
+        contents += "<th></th>"
         days.forEach((day) => {
             contents += "<th>" + day + "</th>"
         })
-        contents += "</tr>";
+        contents += "</thead>";
         for(let t = startTime; t <= endTime; t+= 0.5){
             let time = getTimeStringFromDouble(t)
             contents += "<tr>"
@@ -243,7 +261,7 @@ function refreshUserDataView(userData) {
             if(t !== endTime) {
                 days.forEach((day) => {
                     let avail = (userData.availability[day]) ? ((userData.availability[day][time]) ? " selected" : "") : ""
-                    contents += "<td id=\"user-" + time + "-" + day + "\" class=\"user-availability" + avail + "\">" + avail + "</td>"
+                    contents += "<td id=\"user-" + time + "-" + day + "\" class=\"user-availability" + avail + "\"></td>"
                 })
             }
             contents += "</tr>";
