@@ -1,7 +1,5 @@
-## Pet Gallery
-This the the Pet Gallery Application! It allows you to create a temporary wall of pets you like! It uses a flexbox design pattern.
+## Get2Gether
+Inspired by When2Meet, this website lets you plan your meetings with coworkers! Now with bootstrap and (hopefully) improved phone functionality.
 
-## Technical Achievements
-- **Tech Achievement 1**: Created a Single Page Pet Gallery App that updates on refresh with teh current stored appdata on pet information, including the derived pet call! Updates on refresh, load, delete, and new pet submissions!
-- **Tech Achievement 2**: Created Delete functionality to allow for pets to be removed from the page.
-
+![Get2Gether Create Page](Get2GetherCreatePage.png)
+![Get2Gether Select Page](Get2GetherSelectPage.png)

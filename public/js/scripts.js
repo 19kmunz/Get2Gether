@@ -42,7 +42,7 @@ function setupSelection() {
         .on("stop", ({store: {stored}}) => {
             scrollable = true;
             let userData = convertHtmlElementsToUserData(stored)
-            refreshUserDataView(userData)
+            //refreshUserDataView(userData)
             sendUserData(userData)
         });
 }
@@ -57,7 +57,9 @@ function addCurrentUserToTotalAvailability(totalId) {
         arr.push(sessionStorage.getItem('userName'))
         element.innerHTML = arr.length.toString()
         element.dataset.users = arr.toString();
-        element.style.background = "rgba(var(--blue-r),var(--blue-g),var(--blue-b)," + (1/sessionStorage.getItem('max')) * element.dataset.users.length + ")"
+        let opacity = (1/sessionStorage.getItem('max')) * arr.length;
+        console.log(opacity)
+        element.style.background = "rgba(var(--blue-r),var(--blue-g),var(--blue-b)," + opacity + ")"
     }
 }
 

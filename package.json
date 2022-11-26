@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node server.improved.js"
   },
+  "engines": { "node": "12.x" },
   "dependencies": {
     "@viselect/vanilla": "^3.1.1",
     "body-parser": "^1.20.1",
